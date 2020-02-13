@@ -15,7 +15,7 @@
             while (tokenizer.hasNext() === true) {
                 var token = tokenizer.next();
 
-                $console.append($('<div />').text('"' + token.toString + '"'));
+                $console.append($('<div />').text('"' + token.toString() + '"'));
 
             }
         });

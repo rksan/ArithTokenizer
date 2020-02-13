@@ -1,19 +1,19 @@
-let _ArithToken = class _ArithToken{
+let _ArithToken = class _ArithToken {
     //@param type : String
     //@param chars : [char array]
-    constructor(type, chars){
+    constructor(type, chars) {
         this.type = type || '';
         this.chars = chars || [];
     }
 
     //@return String
-    toString(){
+    toString() {
         return this._toString();
     }
 
     //@param separator : String
     //@return String
-    _toString(separator){
+    _toString(separator) {
         return this.chars.join(separator || '');
     }
 }
@@ -35,7 +35,7 @@ let _ArithTokenizer = class _ArithTokenizer {
     constructor(sequence) {
         this.sequence = sequence || '';
         this.currentIndex = -1;
-        this.buffer = [];
+        this.tokens = [];
     }
 
     //@return boolean
@@ -45,24 +45,43 @@ let _ArithTokenizer = class _ArithTokenizer {
     }
 
     //get next token.
-    //@return [char array] or undefined
+    //@return token or undefined
     next() {
         var idx = this.currentIndex;
 
         //next sentence
         var nextSentence = this._getSentence(++idx);
 
-        this.currentIndex = nextSentence.currentIndex;
+        //return value.
+        var buffer = nextSentence.buffer,
+            token = undefined;
 
-        var token = this._createToken(nextSentence.type, nextSentence.buffer);
+        if (buffer.length !== 0) {
+            //create new token
+            token = this._createToken(nextSentence.type, nextSentence.buffer);
+            //set members
+            this.tokens.push(token);
+        }
+
+        //set members
+        this.currentIndex = nextSentence.currentIndex;
 
         return token;
     }
 
+    //get all tokens
+    //@return 
+    all() {
+        while (this.hasNext() === true) {
+            this.next();
+        }
+        return this.tokens;
+    }
+
     //@param type : String
     //@param buffer : [char array]
-    //@return _ArithToken : new token
-    _createToken(type, buffer){
+    //@return _ArithToken Object : new token
+    _createToken(type, buffer) {
         return new _ArithToken(type, buffer);
     }
 
@@ -139,7 +158,7 @@ let _ArithTokenizer = class _ArithTokenizer {
         return (this.TOKEN_TYPE_SPACE === char);
     }
 
-    //@param startIndex
+    //@param startIndex: number
     //@return sentence: {
     //  type: token type,
     //  currentIndex: number,

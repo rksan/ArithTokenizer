@@ -70,12 +70,13 @@ let _ArithTokenizer = class _ArithTokenizer {
     }
 
     //get all tokens
-    //@return 
-    all() {
+    //@param doClone : boolean
+    //@return [token array]
+    all(doClone) {
         while (this.hasNext() === true) {
             this.next();
         }
-        return this.tokens;
+        return doClone === true ? Array.of(this.tokens) : this.tokens;
     }
 
     //@param type : String

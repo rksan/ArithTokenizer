@@ -8,14 +8,14 @@
             var sequence = $form.find('input[name=input_arith_sequence]').val();
             var $console = $body.find('#arith_console');
 
-            var token = new _ArithTokenizer(sequence);
+            var tokenizer = new _ArithTokenizer(sequence);
 
             $console.append($('<div />').text(sequence));
 
-            while (token.hasNext() === true) {
-                var sentence = token.next();
+            while (tokenizer.hasNext() === true) {
+                var token = tokenizer.next();
 
-                $console.append($('<div />').text('"' + sentence.join('') + '"'));
+                $console.append($('<div />').text('"' + token.toString + '"'));
 
             }
         });

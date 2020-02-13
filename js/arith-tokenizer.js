@@ -1,9 +1,102 @@
+let _ArithTokenType = class _ArithTokenType {
+    //operand
+    static NUMBER = 'NUMBER'; //0 ~ 9
+    static NUMBER_START_CODE = ('0').codePointAt(0);
+    static NUMBER_END_CODE = ('9').codePointAt(0);
+
+    //operators
+    static MINUS = '-';
+    static PLUS = '+';
+    static STAR = '*';
+    static SLASH = '/';
+    static LEFT_SELECTOR = '(';
+    static RIGHT_SELECTOR = ')';
+
+    //other
+    static NONE = 'NONE';
+    static SPACE = ' ';
+}
+
 let _ArithToken = class _ArithToken {
-    //@param type : String
+
+    //<selector> :== <left selector> | <right selector>
+    //<operator> ::= <plus> | <minus> | <star> | <slash>
+    //<operand> ::= <number>
+    //<left selector> ::= '('
+    //<right selector> ::= ')'
+    //<plus> ::= '+'
+    //<minus> ::= '-'
+    //<star> ::= '*'
+    //<slash> ::= '/'
+    //<number> ::= '0' | '1' | '2' ... | '9'
+    //<none> := ''
+    //<space> := ' '
+
+    //@param type : String [property of _ArithTokenType.XXX]
     //@param chars : [char array]
     constructor(type, chars) {
         this.type = type || '';
         this.chars = chars || [];
+    }
+
+    //@return boolean
+    isSelector() {
+        return this.isLeftSelector() || this.isRightSelector();
+    }
+
+    //@return boolean
+    isOperator() {
+        return this.isPlus() || this.isMinus() || this.isStar() || this.isSlash();
+    }
+
+    //@return boolean
+    isOperand() {
+        return this.isNumber();
+    }
+
+    //@return boolean
+    isLeftSelector() {
+        return this.type === _ArithTokenType.LEFT_SELECTOR;
+    }
+
+    //@return boolean
+    isRightSelector() {
+        return this.type === _ArithTokenType.RIGHT_SELECTOR;
+    }
+
+    //@return boolean
+    isPlus() {
+        return this.type === _ArithTokenType.PLUS;
+    }
+
+    //@return boolean
+    isMinus() {
+        return this.type === _ArithTokenType.MINUS;
+    }
+
+    //@return boolean
+    isStar() {
+        return this.type === _ArithTokenType.STAR;
+    }
+
+    //@return boolean
+    isSlash() {
+        return this.type === _ArithTokenType.SLASH;
+    }
+
+    //@return boolean
+    isNumber() {
+        return this.type === _ArithTokenType.NUMBER;
+    }
+
+    //@return boolean
+    isNone() {
+        return this.type === _ArithTokenType.NONE;
+    }
+
+    //@return boolean
+    isSpace() {
+        return this.type === _ArithTokenType.SPACE;
     }
 
     //@return String
@@ -17,25 +110,16 @@ let _ArithToken = class _ArithToken {
         return this.chars.join(separator || '');
     }
 }
+
 let _ArithTokenizer = class _ArithTokenizer {
     //@members
-    TOKEN_TYPE_NONE = 'NONE';
-    TOKEN_TYPE_NUMBER = 'NUMBER';
-    TOKEN_TYPE_MINUS = '-';
-    TOKEN_TYPE_PLUS = '+';
-    TOKEN_TYPE_STAR = '*';
-    TOKEN_TYPE_SLASH = '/';
-    TOKEN_TYPE_LEFT_SELECTOR = '(';
-    TOKEN_TYPE_RIGHT_SELECTOR = ')';
-    TOKEN_TYPE_SPACE = ' ';
-    NUMBER_START_CODE = ('0').codePointAt(0);
-    NUMBER_END_CODE = ('9').codePointAt(0);
+    sequence = '';
+    currentIndex = -1;
+    tokens = [];
 
     //@param sequence : String
     constructor(sequence) {
         this.sequence = sequence || '';
-        this.currentIndex = -1;
-        this.tokens = [];
     }
 
     //@return boolean
@@ -114,49 +198,49 @@ let _ArithTokenizer = class _ArithTokenizer {
     //@return boolean
     _isNumber(char) {
         var code = char.codePointAt(0);
-        return (this.NUMBER_START_CODE <= code && code <= this.NUMBER_END_CODE);
+        return (_ArithTokenType.NUMBER_START_CODE <= code && code <= _ArithTokenType.NUMBER_END_CODE);
     }
 
     //@param char
     //@return boolean
     _isMinus(char) {
-        return (this.TOKEN_TYPE_MINUS === char);
+        return (_ArithTokenType.MINUS === char);
     }
 
     //@param char
     //@return boolean
     _isPlus(char) {
-        return (this.TOKEN_TYPE_PLUS === char);
+        return (_ArithTokenType.PLUS === char);
     }
 
     //@param char
     //@return boolean
     _isStar(char) {
-        return (this.TOKEN_TYPE_STAR === char);
+        return (_ArithTokenType.STAR === char);
     }
 
     //@param char
     //@return boolean
     _isSlash(char) {
-        return (this.TOKEN_TYPE_SLASH === char);
+        return (_ArithTokenType.SLASH === char);
     }
 
     //@param char
     //@return boolean
     _isLeftSelector(char) {
-        return (this.TOKEN_TYPE_LEFT_SELECTOR === char);
+        return (_ArithTokenType.LEFT_SELECTOR === char);
     }
 
     //@param char
     //@return boolean
     _isRightSelector(char) {
-        return (this.TOKEN_TYPE_RIGHT_SELECTOR === char);
+        return (_ArithTokenType.RIGHT_SELECTOR === char);
     }
 
     //@param char
     //@return boolean
     _isSpace(char) {
-        return (this.TOKEN_TYPE_SPACE === char);
+        return (_ArithTokenType.SPACE === char);
     }
 
     //@param startIndex: number
@@ -176,7 +260,7 @@ let _ArithTokenizer = class _ArithTokenizer {
         if (this._isNone(char)) {
             //is end
             sentence = {
-                type: this.TOKEN_TYPE_NONE,
+                type: _ArithTokenType.NONE,
                 currentIndex: idx,
                 buffer: buffer
             };
@@ -257,7 +341,7 @@ let _ArithTokenizer = class _ArithTokenizer {
             }
 
             sentence = {
-                type: this.TOKEN_TYPE_NUMBER,
+                type: _ArithTokenType.NUMBER,
                 currentIndex: idx,
                 buffer: buffer
             };

@@ -16,4 +16,6 @@
         }
     }
 
+    $(document).find('input[name=debug]').on('click', debug_tokenaizer);
+
 })(window.jQuery);

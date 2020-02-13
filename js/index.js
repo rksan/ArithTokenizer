@@ -1,6 +1,6 @@
 (function ($) {
 
-    function debug_tokenaizer() {
+    $(document).find('input[name=go_tokenizer]').on('click', function _debug_tokenaizer() {
         var sequence = $(document).find('input[name=input_arith_sequence]').val();
         var $console = $(document).find('#arith_console');
 
@@ -14,8 +14,6 @@
             $console.append($('<div />').txt('"' + sentence.join('') + '"'));
 
         }
-    }
-
-    $(document).find('input[name=go_tokenizer]').on('click', debug_tokenaizer);
+    });
 
 })(window.jQuery);

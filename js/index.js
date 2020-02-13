@@ -6,12 +6,12 @@
 
         var token = new _ArithTokenizer(sequence);
 
-        $console.html($('<div />').txt(sequence));
+        $console.append($('<div />').txt(sequence));
 
         while (token.hasNext() === true) {
             var sentence = token.next();
 
-            $console.html($('<div />').txt('"' + sentence.join('') + '"'));
+            $console.append($('<div />').txt('"' + sentence.join('') + '"'));
 
         }
     }

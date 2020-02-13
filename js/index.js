@@ -1,8 +1,11 @@
 (function ($) {
+    var $document = $(document),
+        $body = $document.find('body'),
+        $form = $body.find('form');
 
-    $(document).find('#go_tokenizer').on('click', function _debug_tokenaizer() {
-        var sequence = $(document).find('input[name=input_arith_sequence]').val();
-        var $console = $(document).find('#arith_console');
+    $form.find('#go_tokenizer').on('click', function _debug_tokenaizer() {
+        var sequence = $form.find('input[name=input_arith_sequence]').val();
+        var $console = $body.find('#arith_console');
 
         var token = new _ArithTokenizer(sequence);
 

@@ -1,6 +1,6 @@
 (function ($) {
 
-    $(document).find('input[name=go_tokenizer]').on('click', function _debug_tokenaizer() {
+    $(document).find('#go_tokenizer').on('click', function _debug_tokenaizer() {
         var sequence = $(document).find('input[name=input_arith_sequence]').val();
         var $console = $(document).find('#arith_console');
 

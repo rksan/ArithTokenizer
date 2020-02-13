@@ -16,6 +16,6 @@
         }
     }
 
-    $(document).find('input[name=debug]').on('click', debug_tokenaizer);
+    $(document).find('input[name=go_tokenizer]').on('click', debug_tokenaizer);
 
 })(window.jQuery);

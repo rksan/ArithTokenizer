@@ -54,9 +54,16 @@ let _ArithTokenizer = class _ArithTokenizer {
 
         this.currentIndex = nextSentence.currentIndex;
 
-        var token = new _ArithToken(nextSentence.type, nextSentence.buffer);
+        var token = this._createToken(nextSentence.type, nextSentence.buffer);
 
         return token;
+    }
+
+    //@param type : String
+    //@param buffer : [char array]
+    //@return _ArithToken : new token
+    _createToken(type, buffer){
+        return new _ArithToken(type, buffer);
     }
 
     //@param idx

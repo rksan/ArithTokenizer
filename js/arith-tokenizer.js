@@ -15,11 +15,39 @@ let _ArithTokenType = class _ArithTokenType {
     //other
     static NONE = 'NONE';
     static SPACE = ' ';
-}
+};
+
+let _ArithNode = class _ArithNode {
+    //@members
+    _left;
+    _right;
+
+    constructor(token) {
+        this._token = token;
+    }
+
+    setLeft(node) {
+        return (this._left = node);
+    }
+
+    setRight(node) {
+        return (this._right = node);
+    }
+};
 
 let _ArithToken = class _ArithToken {
 
-    //<selector> :== <left selector> | <right selector>
+    //<arith> ::= <arith middle> | <arith pre> | <arith post>
+    //<arith middle> ::= <operand> <operator> <operand>
+    //                 | <left selector> <arith middle> <right selector>
+    //                 | <arith middle> <operand> <arith middle>
+    //<arith pre> ::= <operator> <operand> <operand>
+    //              | <left selector> <arith pre> <right selector>
+    //              | <operand> <arith pre> <arith pre>
+    //<arith post> ::= <operand> <operand> <operator>
+    //               | <left selector> <arith post> <right selector>
+    //               | <arith post> <arith post> <operator>
+    //<selector> ::= <left selector> | <right selector>
     //<operator> ::= <plus> | <minus> | <star> | <slash>
     //<operand> ::= <number>
     //<left selector> ::= '('
@@ -109,7 +137,7 @@ let _ArithToken = class _ArithToken {
     _toString(separator) {
         return this._chars.join(separator || '');
     }
-}
+};
 
 let _ArithTokenizer = class _ArithTokenizer {
     //@members
@@ -163,7 +191,7 @@ let _ArithTokenizer = class _ArithTokenizer {
         while (this.hasNext() === true) {
             this.next();
         }
-        return doClone === true ? Array.of(this._tokens) : this._tokens;
+        return doClone === true ? [].concat(this._tokens) : this._tokens;
     }
 
     //@param type : String
@@ -390,4 +418,4 @@ let _ArithTokenizer = class _ArithTokenizer {
         return sentence;
     }
 
-}
+};

@@ -35,8 +35,8 @@ let _ArithToken = class _ArithToken {
     //@param type : String [property of _ArithTokenType.XXX]
     //@param chars : [char array]
     constructor(type, chars) {
-        this.type = type || '';
-        this.chars = chars || [];
+        this._type = type || '';
+        this._chars = chars || [];
     }
 
     //@return boolean
@@ -56,47 +56,47 @@ let _ArithToken = class _ArithToken {
 
     //@return boolean
     isLeftSelector() {
-        return this.type === _ArithTokenType.LEFT_SELECTOR;
+        return this._type === _ArithTokenType.LEFT_SELECTOR;
     }
 
     //@return boolean
     isRightSelector() {
-        return this.type === _ArithTokenType.RIGHT_SELECTOR;
+        return this._type === _ArithTokenType.RIGHT_SELECTOR;
     }
 
     //@return boolean
     isPlus() {
-        return this.type === _ArithTokenType.PLUS;
+        return this._type === _ArithTokenType.PLUS;
     }
 
     //@return boolean
     isMinus() {
-        return this.type === _ArithTokenType.MINUS;
+        return this._type === _ArithTokenType.MINUS;
     }
 
     //@return boolean
     isStar() {
-        return this.type === _ArithTokenType.STAR;
+        return this._type === _ArithTokenType.STAR;
     }
 
     //@return boolean
     isSlash() {
-        return this.type === _ArithTokenType.SLASH;
+        return this._type === _ArithTokenType.SLASH;
     }
 
     //@return boolean
     isNumber() {
-        return this.type === _ArithTokenType.NUMBER;
+        return this._type === _ArithTokenType.NUMBER;
     }
 
     //@return boolean
     isNone() {
-        return this.type === _ArithTokenType.NONE;
+        return this._type === _ArithTokenType.NONE;
     }
 
     //@return boolean
     isSpace() {
-        return this.type === _ArithTokenType.SPACE;
+        return this._type === _ArithTokenType.SPACE;
     }
 
     //@return String
@@ -107,31 +107,31 @@ let _ArithToken = class _ArithToken {
     //@param separator : String
     //@return String
     _toString(separator) {
-        return this.chars.join(separator || '');
+        return this._chars.join(separator || '');
     }
 }
 
 let _ArithTokenizer = class _ArithTokenizer {
     //@members
-    sequence = '';
-    currentIndex = -1;
-    tokens = [];
+    _sequence = '';
+    _currentIndex = -1;
+    _tokens = [];
 
     //@param sequence : String
     constructor(sequence) {
-        this.sequence = sequence || '';
+        this._sequence = sequence || '';
     }
 
     //@return boolean
     hasNext() {
-        var nextIdx = this.currentIndex + 1;
+        var nextIdx = this._currentIndex + 1;
         return this._inRagneOf(nextIdx);
     }
 
     //get next token.
     //@return token or undefined
     next() {
-        var idx = this.currentIndex;
+        var idx = this._currentIndex;
 
         //next sentence
         var nextSentence = this._getSentence(++idx);
@@ -144,11 +144,11 @@ let _ArithTokenizer = class _ArithTokenizer {
             //create new token
             token = this._createToken(nextSentence.type, nextSentence.buffer);
             //set members
-            this.tokens.push(token);
+            this._tokens.push(token);
         }
 
         //set members
-        this.currentIndex = nextSentence.currentIndex;
+        this._currentIndex = nextSentence.currentIndex;
 
         return token;
     }
@@ -160,7 +160,7 @@ let _ArithTokenizer = class _ArithTokenizer {
         while (this.hasNext() === true) {
             this.next();
         }
-        return doClone === true ? Array.of(this.tokens) : this.tokens;
+        return doClone === true ? Array.of(this._tokens) : this._tokens;
     }
 
     //@param type : String
@@ -173,7 +173,7 @@ let _ArithTokenizer = class _ArithTokenizer {
     //@param idx
     //@return boolean
     _inRagneOf(index) {
-        return (index < this.sequence.length);
+        return (index < this._sequence.length);
     }
 
     //@param idx
@@ -182,7 +182,7 @@ let _ArithTokenizer = class _ArithTokenizer {
         var char = undefined;
 
         if (this._inRagneOf(index)) {
-            char = this.sequence.charAt(index);
+            char = this._sequence.charAt(index);
         }
 
         return char;
@@ -251,9 +251,9 @@ let _ArithTokenizer = class _ArithTokenizer {
     //}
     _getSentence(startIndex) {
 
-        var sentence = {},
-            buffer = [],
-            idx = startIndex;
+        var sentence = {};
+        var buffer = [];
+        var idx = startIndex;
 
         var char = this._getCharAt(idx);
 
@@ -288,12 +288,21 @@ let _ArithTokenizer = class _ArithTokenizer {
             };
 
         } else if (this._isMinus(char)) {
-            var prevIdx = idx,
-                prevChar = '';
+            var prevIdx = idx;
+            var prevChar = '';
 
             if (this._inRagneOf(--prevIdx)) {
                 //get prev char
                 prevChar = this._getCharAt(prevIdx);
+
+                //skip space.
+                while (this._isSpace(prevChar) === true) {
+                    prevChar = '';
+                    if (this._inRagneOf(--prevIdx)) {
+                        //get prev char
+                        prevChar = this._getCharAt(prevIdx);
+                    }
+                }
             }
 
             //The previous character is not a number
@@ -317,8 +326,8 @@ let _ArithTokenizer = class _ArithTokenizer {
             };
 
         } else if (this._isNumber(char)) {
-            var nextIdx = idx,
-                nextChar = '';
+            var nextIdx = idx;
+            var nextChar = '';
 
             //check index
             if (this._inRagneOf(++nextIdx)) {

@@ -35,8 +35,8 @@ let _ArithToken = class _ArithToken {
     //@param type : String [property of _ArithTokenType.XXX]
     //@param chars : [char array]
     constructor(type, chars) {
-        this._type = type || '';
-        this._chars = chars || [];
+        this._type = type || ''; //string of token type
+        this._chars = chars || []; //[array of string]
     }
 
     //@return boolean
@@ -113,15 +113,18 @@ let _ArithToken = class _ArithToken {
 
 let _ArithTokenizer = class _ArithTokenizer {
     //@members
-    _sequence = '';
-    _currentIndex = -1;
-    _tokens = [];
+    _sequence = ''; //string
+    _currentIndex = -1; //number
+    _tokens = []; //[array of node object]
 
-    //@param sequence : String
+    //@param sequence : string
     constructor(sequence) {
         this._sequence = sequence || '';
     }
 
+    //--
+    //like iterator
+    //--
     //@return boolean
     hasNext() {
         var nextIdx = this._currentIndex + 1;
@@ -266,10 +269,14 @@ let _ArithTokenizer = class _ArithTokenizer {
             };
 
         } else if (this._isSpace(char)) {
-            //next sentence
+            //skip space.
+
+            //next sentence.
             sentence = this._getSentence(++idx);
 
         } else if (this._isLeftSelector(char) || this._isRightSelector(char)) { // is '(' ')'
+            //selector.
+
             buffer.push(char);
 
             sentence = {
@@ -279,6 +286,8 @@ let _ArithTokenizer = class _ArithTokenizer {
             };
 
         } else if (this._isPlus(char) || this._isStar(char) || this._isSlash(char)) { // is '+' '*' '/'
+            //operator.
+
             buffer.push(char);
 
             sentence = {
@@ -288,6 +297,13 @@ let _ArithTokenizer = class _ArithTokenizer {
             };
 
         } else if (this._isMinus(char)) {
+            //operator or operand
+
+            //---
+            //When '-' appears in the sequence, if the sequence preceding it is not a number (if it is an operator),
+            //it is necessary to search because the possibility that '-' is a negative sign cannot be discarded.
+            //---
+
             var prevIdx = idx;
             var prevChar = '';
 
@@ -297,6 +313,7 @@ let _ArithTokenizer = class _ArithTokenizer {
 
                 //skip space.
                 while (this._isSpace(prevChar) === true) {
+                    //init
                     prevChar = '';
                     if (this._inRagneOf(--prevIdx)) {
                         //get prev char
@@ -307,6 +324,8 @@ let _ArithTokenizer = class _ArithTokenizer {
 
             //The previous character is not a number
             if (!this._isNumber(prevChar)) {
+                //operand.
+
                 //next sentence
                 sentence = this._getSentence(++idx);
 
@@ -316,6 +335,7 @@ let _ArithTokenizer = class _ArithTokenizer {
                 idx = sentence.currentIndex;
 
             } else {
+                //operator.
                 buffer.push(char);
             }
 
@@ -326,6 +346,14 @@ let _ArithTokenizer = class _ArithTokenizer {
             };
 
         } else if (this._isNumber(char)) {
+            //operand
+
+            //---
+            //If a number appears in a sequence,
+            //you must search for the number in a subsequent sequence.
+            //Consider two or more digits.
+            //---
+
             var nextIdx = idx;
             var nextChar = '';
 
@@ -339,6 +367,7 @@ let _ArithTokenizer = class _ArithTokenizer {
 
             //The next character is a number
             if (this._isNumber(nextChar)) {
+                //two or more digits.
 
                 //format is 'NUMBER'+'NUMBER'+...
                 buffer = [char].concat(sentence.buffer);
@@ -346,6 +375,7 @@ let _ArithTokenizer = class _ArithTokenizer {
                 idx = sentence.currentIndex;
 
             } else {
+                //one digits.
                 buffer.push(char);
             }
 

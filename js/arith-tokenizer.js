@@ -17,24 +17,6 @@ let _ArithTokenType = class _ArithTokenType {
     static SPACE = ' ';
 };
 
-let _ArithNode = class _ArithNode {
-    //@members
-    _left;
-    _right;
-
-    constructor(token) {
-        this._token = token;
-    }
-
-    setLeft(node) {
-        return (this._left = node);
-    }
-
-    setRight(node) {
-        return (this._right = node);
-    }
-};
-
 let _ArithToken = class _ArithToken {
 
     //<arith> ::= <arith middle> | <arith pre> | <arith post>
@@ -362,16 +344,22 @@ let _ArithTokenizer = class _ArithTokenizer {
 
                 idx = sentence.currentIndex;
 
+                sentence = {
+                    type: _ArithTokenType.NUMBER,
+                    currentIndex: idx,
+                    buffer: buffer
+                };
+
             } else {
                 //operator.
                 buffer.push(char);
-            }
 
-            sentence = {
-                type: char,
-                currentIndex: idx,
-                buffer: buffer
-            };
+                sentence = {
+                    type: char,
+                    currentIndex: idx,
+                    buffer: buffer
+                };
+            }
 
         } else if (this._isNumber(char)) {
             //operand

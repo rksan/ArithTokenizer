@@ -131,6 +131,7 @@ class _ArithTokenizer {
     //--
     //like iterator
     //--
+
     //@return boolean
     hasNext() {
         var nextIndex = this._currentIndex + 1;
@@ -140,26 +141,7 @@ class _ArithTokenizer {
     //get next token.
     //@return token or undefined: next token.
     next() {
-        var idx = this._currentIndex;
-
-        //next sentence
-        var nextSentence = this._getSentence(++idx);
-
-        //return value.
-        var chars = nextSentence.chars;
-        var token = undefined;
-
-        //Some character found
-        if (chars.length !== 0) {
-            //create new token
-            token = this._createToken(nextSentence.type, chars);
-            //set members
-            this._tokens.push(token);
-        }
-
-        //set members
-        this._currentIndex = nextSentence.currentIndex;
-
+        var token = this._nextToken();
         return token;
     }
 
@@ -176,10 +158,44 @@ class _ArithTokenizer {
         return clone === true ? [].concat(this._tokens) : this._tokens;
     }
 
+    //get next token.
+    //@return token or undefined: next token.
+    _nextToken() {
+        var idx = this._currentIndex;
+
+        //next sentence
+        var nextSentence = this._getSentence(++idx);
+
+        //return value.
+        var type = nextSentence.type;
+        var chars = nextSentence.chars;
+        var index = nextSentence.currentIndex;
+
+        //create new token
+        var token = this._token(type, chars);
+
+        if (token.isNone()) {
+            //is end
+
+            //clear
+            token = undefined;
+        } else {
+            //Some character found
+
+            //set members
+            this._tokens.push(token);
+        }
+
+        //set members
+        this._currentIndex = index;
+
+        return token;
+    }
+
     //@param type : String
     //@param chars : [char array]
     //@return _Token : new token
-    _createToken(type, chars) {
+    _token(type, chars) {
         return new _ArithToken(type, chars);
     }
 
@@ -322,7 +338,15 @@ class _ArithTokenizer {
         var sentence = this._sentence(type, index, chars);
         var char = this._getCharAt(index);
 
-        if (type = this._asNumber(char)) {
+        //(Summary) Fixed an issue where calling 'Tokenizer.next ()' after reaching the end of the sequence would result in a runtime error.
+        //(Details) In the state of "Tokenizer.hasNext () === false", the return value of "Tokenizer.next ()" must return "undefined". However, the argument of "Tokenizer._asNumber (char)" in the first "if" of the internal process "Tokenizer._getSentence ()" cannot be "undefined". Before that, it was changed to determine "char === undefined".
+        if (type = this._asNone(char)) { //need first.
+            //as end
+
+            //create sentence.
+            sentence = this._sentence(type, index, chars);
+
+        } else if (type = this._asNumber(char)) {
             //as operand
 
             //---
@@ -431,12 +455,6 @@ class _ArithTokenizer {
             //as selector.
 
             chars.push(char);
-
-            //create sentence.
-            sentence = this._sentence(type, index, chars);
-
-        } else if (type = this._asNone(char)) {
-            //as end
 
             //create sentence.
             sentence = this._sentence(type, index, chars);

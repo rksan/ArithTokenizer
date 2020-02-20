@@ -117,6 +117,17 @@ class _ArithToken {
 //<number> ::= ('0' | '1' | '2' ... | '9') | (<none> | <minus>) <number>+
 //<none> := ''
 //<space> := ' '
+//
+//@use
+//<script>
+//  var sequence = '12 + 345 / (-6789 + -10234) * (5 - 6)';
+//  var tokenizer = new ArithTokenizer( sequence );
+//  var tokens = tokenizer.tokenize();
+//  window.console.log( tokens.toString() );
+///*
+// -> ['12', '+', '345', '/', '(', '-6789', '+', '-10234', ')', '*', '(', '5', '-', '6', ')']
+//*/
+//</script>
 class _ArithTokenizer {
     //@members
     _sequence = ''; //string

@@ -110,12 +110,14 @@ class _ArithToken {
 };
 
 //@BNF
-//<token> := (<number> | <operator> | <selector>)*
+//<token> := (<number> | <operator> | <minus> | <selector>)*
 //<selector> ::= '(' | ')'
-//<operator> ::= '+' | '-' | '*' | '/'
-//<number> ::= ('0' | '1' | '2' ... | '9') | ('' | '-') <number>+
+//<operator> ::= '+' | '*' | '/'
+//<minus> ::= '-'
+//<number> ::= ('0' | '1' | '2' ... | '9') | (<none> | <minus>) <number>+
+//<none> := ''
 //<space> := ' '
-let _ArithTokenizer = class _ArithTokenizer {
+class _ArithTokenizer {
     //@members
     _sequence = ''; //string
     _currentIndex = -1; //number
@@ -208,7 +210,7 @@ let _ArithTokenizer = class _ArithTokenizer {
     }
 
     //@param char
-    //@return boolean
+    //@return string : token type or undefined
     _asNumber(char) {
         var code = char.codePointAt(0);
         return (_ArithTokenType.NUMBER_START_CODE <= code && code <= _ArithTokenType.NUMBER_END_CODE) ?
@@ -216,49 +218,79 @@ let _ArithTokenizer = class _ArithTokenizer {
     }
 
     //@param char
-    //@return boolean
+    //@return string : token type or undefined
     _asMinus(char) {
         var type = _ArithTokenType.MINUS;
         return (type === char) ? type : undefined;
     }
 
     //@param char
-    //@return boolean
+    //@return string : token type or undefined
     _asPlus(char) {
         var type = _ArithTokenType.PLUS;
         return (type === char) ? type : undefined;
     }
 
     //@param char
-    //@return boolean
+    //@return string : token type or undefined
     _asStar(char) {
         var type = _ArithTokenType.STAR;
         return (type === char) ? type : undefined;
     }
 
     //@param char
-    //@return boolean
+    //@return string : token type or undefined
     _asSlash(char) {
         var type = _ArithTokenType.SLASH;
         return (type === char) ? type : undefined;
     }
 
     //@param char
-    //@return boolean
+    //@return string : token type or undefined
+    _asOperator(char) {
+        var type = undefined;
+
+        if (type = this._asPlus(char)) {
+            return type;
+        } else if (type = this._asStar(char)) {
+            return type;
+        } else if (type = this._asSlash(char)) {
+            return type;
+        }
+
+        return type;
+    }
+
+    //@param char
+    //@return string : token type or undefined
     _asLeftSelector(char) {
         var type = _ArithTokenType.LEFT_SELECTOR;
         return (type === char) ? type : undefined;
     }
 
     //@param char
-    //@return boolean
+    //@return string : token type or undefined
     _asRightSelector(char) {
         var type = _ArithTokenType.RIGHT_SELECTOR;
         return (type === char) ? type : undefined;
     }
 
     //@param char
-    //@return boolean
+    //@return string : token type or undefined
+    _asSelector(char) {
+        var type = undefined;
+
+        if (type = this._asLeftSelector(char)) {
+            return type;
+        } else if (type = this._asRightSelector(char)) {
+            return type;
+        }
+
+        return type;
+    }
+
+    //@param char
+    //@return string : token type or undefined
     _asSpace(char) {
         var type = _ArithTokenType.SPACE;
         return (type === char) ? type : undefined;
@@ -286,40 +318,51 @@ let _ArithTokenizer = class _ArithTokenizer {
         //init
         var type = '';
         var chars = [];
-        var idx = startIndex;
-        var sentence = this._sentence(type, idx, chars);
-        var char = this._getCharAt(idx);
+        var index = startIndex;
+        var sentence = this._sentence(type, index, chars);
+        var char = this._getCharAt(index);
 
-        if (type = this._asNone(char)) {
-            //as end
+        if (type = this._asNumber(char)) {
+            //as operand
+
+            //---
+            //If a number appears in a sequence,
+            //you must search for the number in a subsequent sequence.
+            //Consider two or more digits.
+            //---
+            let nextIdx = index;
+            let nextChar = '';
+
+            //check index
+            if (this._inRagneOf(++nextIdx)) {
+                //next sentence
+                sentence = this._getSentence(nextIdx);
+
+                nextChar = sentence.chars[0];
+            }
+
+            //The next character is a number
+            if (this._asNumber(nextChar)) {
+                //two or more digits.
+
+                //format is 'NUMBER'+'NUMBER'+...
+                chars = [char].concat(sentence.chars);
+
+                index = sentence.currentIndex;
+
+            } else {
+                //one digits.
+                chars.push(char);
+            }
 
             //create sentence.
-            sentence = this._sentence(type, idx, chars);
+            sentence = this._sentence(type, index, chars);
 
         } else if (type = this._asSpace(char)) {
             //skip space.
 
             //next sentence.
-            sentence = this._getSentence(++idx);
-
-        } else if ((type = this._asLeftSelector(char))
-            || (type = this._asRightSelector(char))) {
-            //as selector.
-
-            chars.push(char);
-
-            //create sentence.
-            sentence = this._sentence(type, idx, chars);
-
-        } else if ((type = this._asPlus(char))
-            || (type = this._asStar(char))
-            || (type = this._asSlash(char))) {
-            //as operator.
-
-            chars.push(char);
-
-            //create sentence.
-            sentence = this._sentence(type, idx, chars);
+            sentence = this._getSentence(++index);
 
         } else if (type = this._asMinus(char)) {
             //as operator or operand
@@ -329,7 +372,7 @@ let _ArithTokenizer = class _ArithTokenizer {
             //if the sequence preceding it is not a number (if it is an operator),
             //it is necessary to search because the possibility that '-' is a negative sign cannot be discarded.
             //---
-            let prevIdx = idx;
+            let prevIdx = index;
             let prevChar = '';
             let prevType = '';
 
@@ -356,61 +399,47 @@ let _ArithTokenizer = class _ArithTokenizer {
                 //as operand.
 
                 //next sentence
-                sentence = this._getSentence(++idx);
+                sentence = this._getSentence(++index);
 
                 //format is '-'+'NUMBER'+'NUMBER'+...
                 chars = [char].concat(sentence.chars);
 
                 type = prevType;
 
-                idx = sentence.currentIndex;
+                index = sentence.currentIndex;
 
                 //create sentence.
-                sentence = this._sentence(type, idx, chars);
+                sentence = this._sentence(type, index, chars);
 
             } else {
                 //as operator.
                 chars.push(char);
 
                 //create sentence.
-                sentence = this._sentence(type, idx, chars);
+                sentence = this._sentence(type, index, chars);
             }
 
-        } else if (type = this._asNumber(char)) {
-            //as operand
+        } else if (type = this._asOperator(char)) {
+            //as operator.
 
-            //---
-            //If a number appears in a sequence,
-            //you must search for the number in a subsequent sequence.
-            //Consider two or more digits.
-            //---
-            let nextIdx = idx;
-            let nextChar = '';
-
-            //check index
-            if (this._inRagneOf(++nextIdx)) {
-                //next sentence
-                sentence = this._getSentence(nextIdx);
-
-                nextChar = sentence.chars[0];
-            }
-
-            //The next character is a number
-            if (this._asNumber(nextChar)) {
-                //two or more digits.
-
-                //format is 'NUMBER'+'NUMBER'+...
-                chars = [char].concat(sentence.chars);
-
-                idx = sentence.currentIndex;
-
-            } else {
-                //one digits.
-                chars.push(char);
-            }
+            chars.push(char);
 
             //create sentence.
-            sentence = this._sentence(type, idx, chars);
+            sentence = this._sentence(type, index, chars);
+
+        } else if (type = this._asSelector(char)) {
+            //as selector.
+
+            chars.push(char);
+
+            //create sentence.
+            sentence = this._sentence(type, index, chars);
+
+        } else if (type = this._asNone(char)) {
+            //as end
+
+            //create sentence.
+            sentence = this._sentence(type, index, chars);
 
         }
 

@@ -1,4 +1,4 @@
-let _ArithTokenType = class _ArithTokenType {
+class _ArithTokenType {
     //operand
     static NUMBER = 'NUMBER'; //0 ~ 9
     static NUMBER_START_CODE = ('0').codePointAt(0);
@@ -9,6 +9,8 @@ let _ArithTokenType = class _ArithTokenType {
     static PLUS = '+';
     static STAR = '*';
     static SLASH = '/';
+
+    //selectors
     static LEFT_SELECTOR = '(';
     static RIGHT_SELECTOR = ')';
 
@@ -17,36 +19,22 @@ let _ArithTokenType = class _ArithTokenType {
     static SPACE = ' ';
 };
 
-let _ArithToken = class _ArithToken {
-
-    //<arith> ::= <arith middle> | <arith pre> | <arith post>
-    //<arith middle> ::= <operand> <operator> <operand>
-    //                 | <left selector> <arith middle> <right selector>
-    //                 | <arith middle> <operand> <arith middle>
-    //<arith pre> ::= <operator> <operand> <operand>
-    //              | <left selector> <arith pre> <right selector>
-    //              | <operand> <arith pre> <arith pre>
-    //<arith post> ::= <operand> <operand> <operator>
-    //               | <left selector> <arith post> <right selector>
-    //               | <arith post> <arith post> <operator>
-    //<selector> ::= <left selector> | <right selector>
-    //<operator> ::= <plus> | <minus> | <star> | <slash>
-    //<operand> ::= <number>
-    //<left selector> ::= '('
-    //<right selector> ::= ')'
-    //<plus> ::= '+'
-    //<minus> ::= '-'
-    //<star> ::= '*'
-    //<slash> ::= '/'
-    //<number> ::= '0' | '1' | '2' ... | '9'
-    //<none> := ''
-    //<space> := ' '
-
+class _ArithToken {
     //@param type : String [property of _ArithTokenType.XXX]
     //@param chars : [char array]
     constructor(type, chars) {
         this._type = type || ''; //string of token type
         this._chars = chars || []; //[array of string]
+    }
+
+    //@return string
+    type() {
+        return this._type;
+    }
+
+    //@return [char array]
+    chars() {
+        return this._chars;
     }
 
     //@return boolean
@@ -66,47 +54,47 @@ let _ArithToken = class _ArithToken {
 
     //@return boolean
     isLeftSelector() {
-        return this._type === _ArithTokenType.LEFT_SELECTOR;
+        return this.type() === _ArithTokenType.LEFT_SELECTOR;
     }
 
     //@return boolean
     isRightSelector() {
-        return this._type === _ArithTokenType.RIGHT_SELECTOR;
+        return this.type() === _ArithTokenType.RIGHT_SELECTOR;
     }
 
     //@return boolean
     isPlus() {
-        return this._type === _ArithTokenType.PLUS;
+        return this.type() === _ArithTokenType.PLUS;
     }
 
     //@return boolean
     isMinus() {
-        return this._type === _ArithTokenType.MINUS;
+        return this.type() === _ArithTokenType.MINUS;
     }
 
     //@return boolean
     isStar() {
-        return this._type === _ArithTokenType.STAR;
+        return this.type() === _ArithTokenType.STAR;
     }
 
     //@return boolean
     isSlash() {
-        return this._type === _ArithTokenType.SLASH;
+        return this.type() === _ArithTokenType.SLASH;
     }
 
     //@return boolean
     isNumber() {
-        return this._type === _ArithTokenType.NUMBER;
+        return this.type() === _ArithTokenType.NUMBER;
     }
 
     //@return boolean
     isNone() {
-        return this._type === _ArithTokenType.NONE;
+        return this.type() === _ArithTokenType.NONE;
     }
 
     //@return boolean
     isSpace() {
-        return this._type === _ArithTokenType.SPACE;
+        return this.type() === _ArithTokenType.SPACE;
     }
 
     //@return String
@@ -117,15 +105,22 @@ let _ArithToken = class _ArithToken {
     //@param separator : String
     //@return String
     _toString(separator) {
-        return this._chars.join(separator || '');
+        return this.chars().join(separator || '');
     }
 };
 
+//@BNF
+//<token> := (<operand> | <operator> | <selector>)*
+//<selector> ::= '(' | ')'
+//<operator> ::= '+' | '-' | '*' | '/'
+//<operand> ::= <number>
+//<number> ::= ('0' | '1' | '2' ... | '9') | ('' | '-') <number>+
+//<space> := ' '
 let _ArithTokenizer = class _ArithTokenizer {
     //@members
     _sequence = ''; //string
     _currentIndex = -1; //number
-    _tokens = []; //[array of node object]
+    _tokens = []; //[array of token object]
 
     //@param sequence : string
     constructor(sequence) {
@@ -137,12 +132,12 @@ let _ArithTokenizer = class _ArithTokenizer {
     //--
     //@return boolean
     hasNext() {
-        var nextIdx = this._currentIndex + 1;
-        return this._inRagneOf(nextIdx);
+        var nextIndex = this._currentIndex + 1;
+        return this._inRagneOf(nextIndex);
     }
 
     //get next token.
-    //@return token or undefined
+    //@return token or undefined: next token.
     next() {
         var idx = this._currentIndex;
 
@@ -150,12 +145,12 @@ let _ArithTokenizer = class _ArithTokenizer {
         var nextSentence = this._getSentence(++idx);
 
         //return value.
-        var buffer = nextSentence.buffer,
+        var chars = nextSentence.chars,
             token = undefined;
 
-        if (buffer.length !== 0) {
+        if (chars.length !== 0) {
             //create new token
-            token = this._createToken(nextSentence.type, nextSentence.buffer);
+            token = this._createToken(nextSentence.type, chars);
             //set members
             this._tokens.push(token);
         }
@@ -166,35 +161,36 @@ let _ArithTokenizer = class _ArithTokenizer {
         return token;
     }
 
-    //get all tokens
-    //@param doClone : boolean
-    //@return [token array]
-    all(doClone) {
+    //@param clone : boolean
+    //@return [token array]: all tokens
+    tokenize(clone) {
         while (this.hasNext() === true) {
             this.next();
         }
-        return doClone === true ? [].concat(this._tokens) : this._tokens;
+        return clone === true ? [].concat(this._tokens) : this._tokens;
     }
 
     //@param type : String
-    //@param buffer : [char array]
+    //@param chars : [char array]
     //@return _ArithToken Object : new token
-    _createToken(type, buffer) {
-        return new _ArithToken(type, buffer);
+    _createToken(type, chars) {
+        return new _ArithToken(type, chars);
     }
 
-    //@param idx
-    //@return boolean
+    //@param idx : index
+    //@return boolean : Determine if index is within range.
     _inRagneOf(index) {
         return (index < this._sequence.length);
     }
 
-    //@param idx
-    //@return char
+    //@param idx : index
+    //@return char : charactor in sequence
     _getCharAt(index) {
         var char = undefined;
 
+        //check index.
         if (this._inRagneOf(index)) {
+            //get char
             char = this._sequence.charAt(index);
         }
 
@@ -202,58 +198,78 @@ let _ArithTokenizer = class _ArithTokenizer {
     }
 
     //@param char
-    //@return boolean
-    _isNone(char) {
-        return (char === undefined);
+    //@return string : token type or undefined
+    _asNone(char) {
+        return (char === undefined) ? _ArithTokenType.NONE : undefined;
     }
 
     //@param char
     //@return boolean
-    _isNumber(char) {
+    _asNumber(char) {
         var code = char.codePointAt(0);
-        return (_ArithTokenType.NUMBER_START_CODE <= code && code <= _ArithTokenType.NUMBER_END_CODE);
+        return (_ArithTokenType.NUMBER_START_CODE <= code && code <= _ArithTokenType.NUMBER_END_CODE) ?
+            _ArithTokenType.NUMBER : undefined;
     }
 
     //@param char
     //@return boolean
-    _isMinus(char) {
-        return (_ArithTokenType.MINUS === char);
+    _asMinus(char) {
+        var type = _ArithTokenType.MINUS;
+        return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return boolean
-    _isPlus(char) {
-        return (_ArithTokenType.PLUS === char);
+    _asPlus(char) {
+        var type = _ArithTokenType.PLUS;
+        return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return boolean
-    _isStar(char) {
-        return (_ArithTokenType.STAR === char);
+    _asStar(char) {
+        var type = _ArithTokenType.STAR;
+        return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return boolean
-    _isSlash(char) {
-        return (_ArithTokenType.SLASH === char);
+    _asSlash(char) {
+        var type = _ArithTokenType.SLASH;
+        return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return boolean
-    _isLeftSelector(char) {
-        return (_ArithTokenType.LEFT_SELECTOR === char);
+    _asLeftSelector(char) {
+        var type = _ArithTokenType.LEFT_SELECTOR;
+        return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return boolean
-    _isRightSelector(char) {
-        return (_ArithTokenType.RIGHT_SELECTOR === char);
+    _asRightSelector(char) {
+        var type = _ArithTokenType.RIGHT_SELECTOR;
+        return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return boolean
-    _isSpace(char) {
-        return (_ArithTokenType.SPACE === char);
+    _asSpace(char) {
+        var type = _ArithTokenType.SPACE;
+        return (type === char) ? type : undefined;
+    }
+
+    //@param type: string. property of _ArithTokenType.XXX
+    //@param currentIndex: number.
+    //@param chars: [array of string]
+    //@return plain object.
+    _sentence(type, currentIndex, chars) {
+        return {
+            'type': type,
+            'currentIndex': currentIndex,
+            'chars': chars
+        };
     }
 
     //@param startIndex: number
@@ -263,68 +279,67 @@ let _ArithTokenizer = class _ArithTokenizer {
     //  buffer: [char array]
     //}
     _getSentence(startIndex) {
-
-        var sentence = {};
-        var buffer = [];
+        //init
+        var type = '';
+        var chars = [];
         var idx = startIndex;
-
+        var sentence = this._sentence(type, idx, chars);
         var char = this._getCharAt(idx);
 
-        if (this._isNone(char)) {
-            //is end
-            sentence = {
-                type: _ArithTokenType.NONE,
-                currentIndex: idx,
-                buffer: buffer
-            };
+        if (type = this._asNone(char)) {
+            //as end
 
-        } else if (this._isSpace(char)) {
+            //create sentence.
+            sentence = this._sentence(type, idx, chars);
+
+        } else if (type = this._asSpace(char)) {
             //skip space.
 
             //next sentence.
             sentence = this._getSentence(++idx);
 
-        } else if (this._isLeftSelector(char) || this._isRightSelector(char)) { // is '(' ')'
-            //selector.
+        } else if ((type = this._asLeftSelector(char))
+            || (type = this._asRightSelector(char))) { // is '(' ')'
+            //as selector.
 
-            buffer.push(char);
+            chars.push(char);
 
-            sentence = {
-                type: char,
-                currentIndex: idx,
-                buffer: buffer
-            };
+            //create sentence.
+            sentence = this._sentence(type, idx, chars);
 
-        } else if (this._isPlus(char) || this._isStar(char) || this._isSlash(char)) { // is '+' '*' '/'
-            //operator.
+        } else if ((type = this._asPlus(char))
+            || (type = this._asStar(char))
+            || (type = this._asSlash(char))) { // is '+' '*' '/'
+            //as operator.
 
-            buffer.push(char);
+            chars.push(char);
 
-            sentence = {
-                type: char,
-                currentIndex: idx,
-                buffer: buffer
-            };
+            //create sentence.
+            sentence = this._sentence(type, idx, chars);
 
-        } else if (this._isMinus(char)) {
-            //operator or operand
+        } else if (type = this._asMinus(char)) {
+            //as operator or operand
 
             //---
-            //When '-' appears in the sequence, if the sequence preceding it is not a number (if it is an operator),
+            //When '-' appears in the sequence, 
+            //if the sequence preceding it is not a number (if it is an operator),
             //it is necessary to search because the possibility that '-' is a negative sign cannot be discarded.
             //---
+            let prevIdx = idx;
+            let prevChar = '';
+            let prevType = '';
 
-            var prevIdx = idx;
-            var prevChar = '';
-
-            if (this._inRagneOf(--prevIdx)) {
+            //check index.
+            if (this._asRagneOf(--prevIdx)) {
                 //get prev char
                 prevChar = this._getCharAt(prevIdx);
 
                 //skip space.
-                while (this._isSpace(prevChar) === true) {
+                while (this._asSpace(prevChar)) {
                     //init
                     prevChar = '';
+
+                    //check index.
                     if (this._inRagneOf(--prevIdx)) {
                         //get prev char
                         prevChar = this._getCharAt(prevIdx);
@@ -333,73 +348,65 @@ let _ArithTokenizer = class _ArithTokenizer {
             }
 
             //The previous character is not a number
-            if (!this._isNumber(prevChar)) {
-                //operand.
+            if (!(prevType = this._asNumber(prevChar))) {
+                //as operand.
 
                 //next sentence
                 sentence = this._getSentence(++idx);
 
                 //format is '-'+'NUMBER'+'NUMBER'+...
-                buffer = [char].concat(sentence.buffer);
+                chars = [char].concat(sentence.chars);
+
+                type = prevType;
 
                 idx = sentence.currentIndex;
 
-                sentence = {
-                    type: _ArithTokenType.NUMBER,
-                    currentIndex: idx,
-                    buffer: buffer
-                };
+                //create sentence.
+                sentence = this._sentence(type, idx, chars);
 
             } else {
-                //operator.
-                buffer.push(char);
+                //as operator.
+                chars.push(char);
 
-                sentence = {
-                    type: char,
-                    currentIndex: idx,
-                    buffer: buffer
-                };
+                //create sentence.
+                sentence = this._sentence(type, idx, chars);
             }
 
-        } else if (this._isNumber(char)) {
-            //operand
+        } else if (type = this._asNumber(char)) {
+            //as operand
 
             //---
             //If a number appears in a sequence,
             //you must search for the number in a subsequent sequence.
             //Consider two or more digits.
             //---
-
-            var nextIdx = idx;
-            var nextChar = '';
+            let nextIdx = idx;
+            let nextChar = '';
 
             //check index
             if (this._inRagneOf(++nextIdx)) {
                 //next sentence
                 sentence = this._getSentence(nextIdx);
 
-                nextChar = sentence.buffer[0];
+                nextChar = sentence.chars[0];
             }
 
             //The next character is a number
-            if (this._isNumber(nextChar)) {
+            if (this._asNumber(nextChar)) {
                 //two or more digits.
 
                 //format is 'NUMBER'+'NUMBER'+...
-                buffer = [char].concat(sentence.buffer);
+                chars = [char].concat(sentence.chars);
 
                 idx = sentence.currentIndex;
 
             } else {
                 //one digits.
-                buffer.push(char);
+                chars.push(char);
             }
 
-            sentence = {
-                type: _ArithTokenType.NUMBER,
-                currentIndex: idx,
-                buffer: buffer
-            };
+            //create sentence.
+            sentence = this._sentence(type, idx, chars);
 
         }
 

@@ -110,10 +110,9 @@ class _ArithToken {
 };
 
 //@BNF
-//<token> := (<operand> | <operator> | <selector>)*
+//<token> := (<number> | <operator> | <selector>)*
 //<selector> ::= '(' | ')'
 //<operator> ::= '+' | '-' | '*' | '/'
-//<operand> ::= <number>
 //<number> ::= ('0' | '1' | '2' ... | '9') | ('' | '-') <number>+
 //<space> := ' '
 let _ArithTokenizer = class _ArithTokenizer {
@@ -145,9 +144,10 @@ let _ArithTokenizer = class _ArithTokenizer {
         var nextSentence = this._getSentence(++idx);
 
         //return value.
-        var chars = nextSentence.chars,
-            token = undefined;
+        var chars = nextSentence.chars;
+        var token = undefined;
 
+        //Some character found
         if (chars.length !== 0) {
             //create new token
             token = this._createToken(nextSentence.type, chars);
@@ -164,9 +164,13 @@ let _ArithTokenizer = class _ArithTokenizer {
     //@param clone : boolean
     //@return [token array]: all tokens
     tokenize(clone) {
+        //Process all the rest
         while (this.hasNext() === true) {
+            //get next
             this.next();
         }
+
+        //For clones, concatenate the existing token array to the new array
         return clone === true ? [].concat(this._tokens) : this._tokens;
     }
 

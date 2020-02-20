@@ -176,7 +176,7 @@ let _ArithTokenizer = class _ArithTokenizer {
 
     //@param type : String
     //@param chars : [char array]
-    //@return _ArithToken Object : new token
+    //@return _Token : new token
     _createToken(type, chars) {
         return new _ArithToken(type, chars);
     }
@@ -280,7 +280,7 @@ let _ArithTokenizer = class _ArithTokenizer {
     //@return sentence: {
     //  type: token type,
     //  currentIndex: number,
-    //  buffer: [char array]
+    //  chars: [char array]
     //}
     _getSentence(startIndex) {
         //init
@@ -303,7 +303,7 @@ let _ArithTokenizer = class _ArithTokenizer {
             sentence = this._getSentence(++idx);
 
         } else if ((type = this._asLeftSelector(char))
-            || (type = this._asRightSelector(char))) { // is '(' ')'
+            || (type = this._asRightSelector(char))) {
             //as selector.
 
             chars.push(char);
@@ -313,7 +313,7 @@ let _ArithTokenizer = class _ArithTokenizer {
 
         } else if ((type = this._asPlus(char))
             || (type = this._asStar(char))
-            || (type = this._asSlash(char))) { // is '+' '*' '/'
+            || (type = this._asSlash(char))) {
             //as operator.
 
             chars.push(char);
@@ -334,7 +334,7 @@ let _ArithTokenizer = class _ArithTokenizer {
             let prevType = '';
 
             //check index.
-            if (this._asRagneOf(--prevIdx)) {
+            if (this._inRagneOf(--prevIdx)) {
                 //get prev char
                 prevChar = this._getCharAt(prevIdx);
 

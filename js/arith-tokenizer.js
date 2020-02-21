@@ -1,8 +1,10 @@
 class _ArithTokenType {
     //operand
     static NUMBER = 'NUMBER'; //0 ~ 9
-    static NUMBER_START_CODE = ('0').codePointAt(0);
-    static NUMBER_END_CODE = ('9').codePointAt(0);
+    static NUMBER_LOWER_LIMIT = '0';
+    static NUMBER_UPPER_LIMIT = '9';
+    static NUMBER_LOWER_LIMIT_CODE = (this.NUMBER_LOWER).codePointAt(0);
+    static NUMBER_UPPER_LIMIT_CODE = (this.NUMBER_UPPER_LIMIT).codePointAt(0);
 
     //operators
     static MINUS = '-';
@@ -239,9 +241,21 @@ class _ArithTokenizer {
     //@param char
     //@return string : token type or undefined
     _asNumber(char) {
-        var code = char.codePointAt(0);
-        return (_ArithTokenType.NUMBER_START_CODE <= code && code <= _ArithTokenType.NUMBER_END_CODE) ?
-            _ArithTokenType.NUMBER : undefined;
+        var type = _ArithTokenType.NUMBER;
+
+        //Returns Type if called without arguments
+        if (arguments.length === 0) {
+            return type;
+        } else {
+            //get char code
+            var code = char.codePointAt(0);
+
+            if (_ArithTokenType.NUMBER_LOWER_LIMIT_CODE <= code && code <= _ArithTokenType.NUMBER_UPPER_LIMIT_CODE) {
+                return type;
+            }
+
+            return undefined;
+        }
     }
 
     //@param char
@@ -409,7 +423,6 @@ class _ArithTokenizer {
             //---
             let prevIdx = index;
             let prevChar = '';
-            let prevType = '';
 
             //check index.
             if (this._inRagneOf(--prevIdx)) {
@@ -430,7 +443,7 @@ class _ArithTokenizer {
             }
 
             //The previous character is not a number
-            if (!(prevType = this._asNumber(prevChar))) {
+            if (!this._asNumber(prevChar)) {
                 //as operand.
 
                 //next sentence
@@ -439,7 +452,7 @@ class _ArithTokenizer {
                 //format is '-'+'NUMBER'+'NUMBER'+...
                 chars = [char].concat(sentence.chars);
 
-                type = prevType;
+                type = this._asNumber();
 
                 index = sentence.currentIndex;
 

@@ -12,7 +12,10 @@
 
             $console.append($('<div />').append($('<span />').text('sequence:'), $('<span />').text(sequence)));
 
-            var $table = $('<table />');
+            var $table = $('<table />').css({
+                'boder':'1px solid gray',
+                'border-collapse': 'collapse'
+            });
             var $tr = $('<tr />');
             var $th = $('<th />');
             var $td = $('<td />');
@@ -20,20 +23,22 @@
             //header
             $table.append(
                 $tr.clone().append(
+                    $th.clone().text('index'),
                     $th.clone().text('token.type'),
                     $th.clone().text('token.chars')
                 )
             );
 
+            var index = -1;
+
             while (tokenizer.hasNext() === true) {
                 var token = tokenizer.next();
 
-                //$console.append($('<div />').text('"' + token.toString() + '"'));
-
                 $table.append(
                     $tr.clone().append(
+                        $td.clone().text(++index),
                         $td.clone().text(token.type()),
-                        $td.clone().text(token.toString())
+                        $td.clone().text('"'+token.toString()+'"')
                     )
                 );
             }

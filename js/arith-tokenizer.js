@@ -17,6 +17,7 @@ class _ArithTokenType {
     static RIGHT_SELECTOR = ')';
 
     //other
+    static ERROR = 'ERROR';
     static NONE = 'NONE';
     static SPACE = ' ';
 };
@@ -87,6 +88,11 @@ class _ArithToken {
     //@return boolean
     isNumber() {
         return this.type() === _ArithTokenType.NUMBER;
+    }
+
+    //@return boolean
+    isError() {
+        return this.type() === _ArithTokenType.ERROR;
     }
 
     //@return boolean
@@ -337,6 +343,13 @@ class _ArithTokenizer {
         return (type === char) ? type : undefined;
     }
 
+    //@param char
+    //@return string : token type or undefined
+    _asError(char) {
+        var type = _ArithTokenType.ERROR;
+        return type;
+    }
+
     //@param type: string. property of _ArithTokenType.XXX
     //@param currentIndex: number.
     //@param chars: [array of string]
@@ -483,6 +496,15 @@ class _ArithTokenizer {
             //create sentence.
             sentence = this._sentence(type, index, chars);
 
+        } else {
+            //as error
+
+            chars.push(char);
+
+            type = this._asError();
+
+            //create sentence.
+            sentence = this._sentence(type, index, chars);
         }
 
         return sentence;

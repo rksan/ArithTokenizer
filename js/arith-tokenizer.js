@@ -1,9 +1,9 @@
 class _ArithTokenType {
     //operand
-    static NUMBER = 'NUMBER'; //0 ~ 9
+    static NUMBER = 'NUMBER'; //[0-9]
     static NUMBER_LOWER_LIMIT = '0';
     static NUMBER_UPPER_LIMIT = '9';
-    static NUMBER_LOWER_LIMIT_CODE = (this.NUMBER_LOWER).codePointAt(0);
+    static NUMBER_LOWER_LIMIT_CODE = (this.NUMBER_LOWER_LIMIT).codePointAt(0);
     static NUMBER_UPPER_LIMIT_CODE = (this.NUMBER_UPPER_LIMIT).codePointAt(0);
 
     //operators
@@ -372,7 +372,7 @@ class _ArithTokenizer {
             sentence = this._sentence(type, index, chars);
 
         } else if (type = this._asNumber(char)) {
-            //as operand
+            //as number
 
             //---
             //If a number appears in a sequence,
@@ -414,7 +414,7 @@ class _ArithTokenizer {
             sentence = this._getSentence(++index);
 
         } else if (type = this._asMinus(char)) {
-            //as operator or operand
+            //as operator or number
 
             //---
             //When '-' appears in the sequence, 
@@ -444,7 +444,7 @@ class _ArithTokenizer {
 
             //The previous character is not a number
             if (!this._asNumber(prevChar)) {
-                //as operand.
+                //as number.
 
                 //next sentence
                 sentence = this._getSentence(++index);

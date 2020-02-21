@@ -6,6 +6,9 @@ class _ArithTokenType {
     static NUMBER_LOWER_LIMIT_CODE = (this.NUMBER_LOWER_LIMIT).codePointAt(0);
     static NUMBER_UPPER_LIMIT_CODE = (this.NUMBER_UPPER_LIMIT).codePointAt(0);
 
+    //decimal
+    static DOT = '.';
+
     //operators
     static MINUS = '-';
     static PLUS = '+';
@@ -119,10 +122,14 @@ class _ArithToken {
 
 //@BNF
 //<token> := (<number> | <operator> | <minus> | <selector>)*
+//<positive> ::= ('0' | '1' | '2' ... | '9') | <positive>+
+//<number> ::= <positive>
+//           | (<none>|<minus>) <positive>
+//           | <number> <dot> <positive>
 //<selector> ::= '(' | ')'
 //<operator> ::= '+' | '*' | '/'
 //<minus> ::= '-'
-//<number> ::= ('0' | '1' | '2' ... | '9') | (<none> | <minus>) <number>+
+//<dot> ::= '.'
 //<none> := ''
 //<space> := ' '
 //
@@ -246,6 +253,13 @@ class _ArithTokenizer {
 
     //@param char
     //@return string : token type or undefined
+    _asDot(char) {
+        var type = _ArithTokenType.DOT;
+        return (type === char) ? type : undefined;
+    }
+
+    //@param char
+    //@return string : token type or undefined
     _asNumber(char) {
         var type = _ArithTokenType.NUMBER;
 
@@ -257,6 +271,8 @@ class _ArithTokenizer {
             var code = char.codePointAt(0);
 
             if (_ArithTokenType.NUMBER_LOWER_LIMIT_CODE <= code && code <= _ArithTokenType.NUMBER_UPPER_LIMIT_CODE) {
+                return type;
+            }else if(_ArithTokenType.DOT === char){
                 return type;
             }
 

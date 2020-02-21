@@ -12,17 +12,19 @@
 
             $console.append($('<div />').append($('<span />').text('sequence:'), $('<span />').text(sequence)));
 
-            var $table = $('<table />').css({
-                'boder':'1px solid gray',
-                'border-collapse': 'collapse'
-            });
+            var $table = $('<table />').css([
+                'boder-width:1px',
+                'border-style: solid',
+                'border-color: gray',
+                'border-collapse: collapse'
+            ]);
             var $tr = $('<tr />');
-            var $th = $('<th />').css({
-                'boder-bottom':'1px solid gray'
-            });
-            var $td = $('<td />').css({
-                'boder-bottom':'1px solid gray'
-            });
+            var $th = $('<th />').css([
+                'boder-bottom:1px solid gray'
+            ]);
+            var $td = $('<td />').css([
+                'boder-bottom:1px solid gray'
+            ]);
 
             //header
             $table.append(

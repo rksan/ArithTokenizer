@@ -13,16 +13,14 @@
             $console.append($('<div />').append($('<span />').text('sequence:'), $('<span />').text(sequence)));
 
             var $table = $('<table />').css({
-                'border':'1px solid gray',
                 'border-collapse':' collapse'
             });
-            var $tr = $('<tr />');
-            var $th = $('<th />').css({
+            var $tr = $('<tr />').css({
+                'border-top':'1px solid gray',
                 'border-bottom':'1px solid gray'
             });
-            var $td = $('<td />').css({
-                'border-bottom':'1px solid gray'
-            });
+            var $th = $('<th />');
+            var $td = $('<td />');
 
             //header
             $table.append(

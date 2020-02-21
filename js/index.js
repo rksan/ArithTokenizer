@@ -17,8 +17,12 @@
                 'border-collapse': 'collapse'
             });
             var $tr = $('<tr />');
-            var $th = $('<th />');
-            var $td = $('<td />');
+            var $th = $('<th />').css({
+                'boder-bottom':'1px solid gray'
+            });
+            var $td = $('<td />').css({
+                'boder-bottom':'1px solid gray'
+            });
 
             //header
             $table.append(

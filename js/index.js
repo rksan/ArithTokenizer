@@ -1,3 +1,5 @@
+import { Tokenizer } from 'arith-tokenizer/arith-tokenizer.js';
+
 (function ($) {
     $(function _ready() {
         var $document = $(document),
@@ -8,7 +10,8 @@
             var sequence = $form.find('input[name=input_arith_sequence]').val();
             var $console = $body.find('#arith_console');
 
-            var tokenizer = new _ArithTokenizer(sequence);
+            //var tokenizer = new _ArithTokenizer(sequence);
+            var tokenizer = new Tokenizer(sequence);
 
             $console.append($('<div />').append($('<span />').text('sequence:'), $('<span />').text(sequence)));
 

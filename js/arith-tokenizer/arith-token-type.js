@@ -1,6 +1,6 @@
 export default class {
     //_ArithTokenType
-    
+
     //operand
     static NUMBER = 'NUMBER'; //[0-9]
     static NUMBER_LOWER_LIMIT = '0';

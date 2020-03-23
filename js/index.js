@@ -1,4 +1,4 @@
-import { Tokenizer } from 'arith-tokenizer/arith-tokenizer.js';
+import { Tokenizer } from '/arith-tokenizer/arith-tokenizer.js';
 
 (function ($) {
     $(function _ready() {

@@ -23,8 +23,8 @@
 //*/
 //</script>
 
-import { TokenType } from '/arith-token-type.js';
-import { Token } from '/arith-token.js';
+import { TokenType } from './arith-token-type.js';
+import { Token } from './arith-token.js';
 
 export default class {
     //class _ArithTokenizer

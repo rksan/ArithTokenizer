@@ -55,7 +55,7 @@ import Tokenizer from './arith-tokenizer/arith-tokenizer.js';
                 );
             }
 
-            $table.sortable();
+            $tbody.sortable();
 
             $console.append($table);
         });

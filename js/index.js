@@ -28,7 +28,7 @@ import Tokenizer from './arith-tokenizer/arith-tokenizer.js';
             var $td = $('<td />');
 
             //header
-            $table.append(thead);
+            $table.append($thead);
 
             $thead.append(
                 $tr.clone().append(

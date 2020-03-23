@@ -1,4 +1,4 @@
-import { TokenType } from './arith-token-type.js'
+import TokenType from './arith-token-type.js'
 
 export default class {
     //_ArithToken

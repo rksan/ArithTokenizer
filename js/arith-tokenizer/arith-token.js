@@ -4,8 +4,8 @@ export default class {
     //_ArithToken
 
     //members
-    #type;
-    #chars;
+    #type = '';
+    #chars = [];
 
     //@param type : String [property of _ArithTokenType.XXX]
     //@param chars : [char array]
@@ -91,12 +91,12 @@ export default class {
 
     //@return String
     toString() {
-        return this.#toString();
+        return this.#_toString();
     }
 
     //@param separator : String
     //@return String
-    #toString(separator) {
+    #_toString(separator) {
         return this.chars().join(separator || '');
     }
 

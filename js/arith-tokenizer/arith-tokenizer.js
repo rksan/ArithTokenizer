@@ -51,21 +51,21 @@ export default class {
     //--
 
     //@return boolean
-    get hasNext() {
+    hasNext() {
         var nextIndex = this.#currentIndex + 1;
         return this.#inRagneOf(nextIndex);
     }
 
     //get next token.
     //@return token or undefined: next token.
-    get next() {
+    next() {
         var token = this.#nextToken();
         return token;
     }
 
     //@param clone : boolean
     //@return [token array]: all tokens
-    get tokenize(clone) {
+    tokenize(clone) {
         //Process all the rest
         while (this.hasNext() === true) {
             //get next

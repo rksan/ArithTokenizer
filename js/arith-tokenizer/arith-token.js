@@ -99,4 +99,5 @@ export default class {
     #toString(separator) {
         return this.chars().join(separator || '');
     }
+
 };

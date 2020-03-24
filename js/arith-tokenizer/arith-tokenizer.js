@@ -26,17 +26,24 @@
 import TokenType from './arith-token-type.js';
 import Factory from './arith-tokenizer-factory.js';
 
+//--
+//private
+
+const symbol_sequence = Symbol('sequence');
+
 export default class {
     //class _ArithTokenizer
+    
 
     //@members
-    #sequence = ''; //string
+    //#sequence = ''; //string
     #currentIndex = -1; //number
     #tokens = []; //[array of token object]
 
     //@param sequence : string
     constructor(sequence) {
         this.#sequence = sequence || '';
+        this[symbol_sequence] = sequence || '';
     }
 
     //--
@@ -44,21 +51,21 @@ export default class {
     //--
 
     //@return boolean
-    hasNext() {
+    get hasNext() {
         var nextIndex = this.#currentIndex + 1;
         return this.#inRagneOf(nextIndex);
     }
 
     //get next token.
     //@return token or undefined: next token.
-    next() {
+    get next() {
         var token = this.#nextToken();
         return token;
     }
 
     //@param clone : boolean
     //@return [token array]: all tokens
-    tokenize(clone) {
+    get tokenize(clone) {
         //Process all the rest
         while (this.hasNext() === true) {
             //get next
@@ -74,7 +81,7 @@ export default class {
 
     //get next token.
     //@return token or undefined: next token.
-    #nextToken = function _nextToken() {
+    _nextToken() {
         var idx = this.#currentIndex;
 
         //next sentence
@@ -109,19 +116,19 @@ export default class {
     //@param type : String
     //@param chars : [char array]
     //@return _Token : new token
-    #createToken = function _createToken(type, chars) {
+    _createToken(type, chars) {
         return Factory.createToken(type, chars);
     };
 
     //@param idx : index
     //@return boolean : Determine if index is within range.
-    #inRagneOf = function _inRangeOf(index) {
+    _inRangeOf(index) {
         return (index < this.#sequence.length);
     }
 
     //@param idx : index
     //@return char : charactor in sequence
-    #getCharAt = function _getCharAt(index) {
+    _getCharAt(index) {
         var char = undefined;
 
         //check index.
@@ -135,20 +142,20 @@ export default class {
 
     //@param char
     //@return string : token type or undefined
-    #asNone = function _asNone(char) {
+    _asNone(char) {
         return (char === undefined) ? TokenType.NONE : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asDot = function _asDot(char) {
+    _asDot(char) {
         var type = TokenType.DOT;
         return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asNumber = function _asNumber(char) {
+    _asNumber(char) {
         var type = TokenType.NUMBER;
 
         //Returns Type if called without arguments
@@ -170,35 +177,35 @@ export default class {
 
     //@param char
     //@return string : token type or undefined
-    #asMinus = function _asMinus(char) {
+    _asMinus(char) {
         var type = TokenType.MINUS;
         return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asPlus = function _asPlus(char) {
+    _asPlus(char) {
         var type = TokenType.PLUS;
         return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asStar = function _asStar(char) {
+    _asStar(char) {
         var type = TokenType.STAR;
         return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asSlash = function _asSlash(char) {
+    _asSlash(char) {
         var type = TokenType.SLASH;
         return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asOperator = function _asOperator(char) {
+    _asOperator(char) {
         var type = undefined;
 
         if (type = this.#asPlus(char)) {
@@ -214,21 +221,21 @@ export default class {
 
     //@param char
     //@return string : token type or undefined
-    #asLeftSelector = function _asLeftSelector(char) {
+    _asLeftSelector(char) {
         var type = TokenType.LEFT_SELECTOR;
         return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asRightSelector = function _asRightSelector(char) {
+    _asRightSelector(char) {
         var type = TokenType.RIGHT_SELECTOR;
         return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asSelector = function _asSelector(char) {
+    _asSelector(char) {
         var type = undefined;
 
         if (type = this.#asLeftSelector(char)) {
@@ -242,14 +249,14 @@ export default class {
 
     //@param char
     //@return string : token type or undefined
-    #asSpace = function _asSpace(char) {
+    _asSpace(char) {
         var type = TokenType.SPACE;
         return (type === char) ? type : undefined;
     }
 
     //@param char
     //@return string : token type or undefined
-    #asError = function _asError(char) {
+    _asError(char) {
         var type = TokenType.ERROR;
         return type;
     }
@@ -258,7 +265,7 @@ export default class {
     //@param currentIndex: number.
     //@param chars: [array of string]
     //@return plain object.
-    #sentence = function _sentence(type, currentIndex, chars) {
+    _sentence(type, currentIndex, chars) {
         return {
             'type': type,
             'currentIndex': currentIndex,
@@ -272,7 +279,7 @@ export default class {
     //  currentIndex: number,
     //  chars: [char array]
     //}
-    #getSentence = function _getSentence(startIndex) {
+    _getSentence(startIndex) {
         //init
         var type = '';
         var chars = [];

@@ -1,4 +1,4 @@
-import Factory from './arith-tokenizer/arith-tokenizer-factory';
+import Factory from './arith-tokenizer/arith-tokenizer-factory.js';
 
 (function ($) {
     $(function _ready() {

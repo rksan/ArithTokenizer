@@ -36,7 +36,7 @@ export default class {
     
 
     //@members
-    //#sequence = ''; //string
+    #sequence = ''; //string
     #currentIndex = -1; //number
     #tokens = []; //[array of token object]
 

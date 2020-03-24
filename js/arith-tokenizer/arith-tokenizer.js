@@ -53,7 +53,7 @@ export default class {
     //@return boolean
     hasNext() {
         var nextIndex = this.#currentIndex + 1;
-        return this._inRagneOf(nextIndex);
+        return this._inRangeOf(nextIndex);
     }
 
     //get next token.
@@ -111,14 +111,14 @@ export default class {
         this.#currentIndex = index;
 
         return token;
-    };
+    }
 
     //@param type : String
     //@param chars : [char array]
     //@return _Token : new token
     _createToken(type, chars) {
         return Factory.createToken(type, chars);
-    };
+    }
 
     //@param idx : index
     //@return boolean : Determine if index is within range.

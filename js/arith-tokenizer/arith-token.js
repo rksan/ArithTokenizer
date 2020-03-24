@@ -91,13 +91,14 @@ export default class {
 
     //@return String
     toString() {
-        return this.#_toString();
+        //return this.#toString();
+        return this.chars().join('');
     }
-
+/*
     //@param separator : String
     //@return String
-    #_toString(separator) {
+    #toString(separator) {
         return this.chars().join(separator || '');
     }
-
+*/
 };

@@ -91,7 +91,7 @@ export default class {
 
     //@return String
     toString() {
-        return this.#_toString();
+        return this._toString();
         //return this.chars().join('');
     }
 
@@ -100,7 +100,7 @@ export default class {
 
     //@param separator : String
     //@return String
-    #_toString = function _toString(separator){
+    _toString = function _toString(separator){
         return this.chars().join(separator || '');
     }
 };

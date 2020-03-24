@@ -26,15 +26,9 @@
 import TokenType from './arith-token-type.js';
 import Factory from './arith-tokenizer-factory.js';
 
-//--
-//private
-
-const symbol_sequence = Symbol('sequence');
-
 export default class {
     //class _ArithTokenizer
     
-
     //@members
     #sequence = ''; //string
     #currentIndex = -1; //number
@@ -43,7 +37,6 @@ export default class {
     //@param sequence : string
     constructor(sequence) {
         this.#sequence = sequence || '';
-        this[symbol_sequence] = sequence || '';
     }
 
     //--
@@ -132,7 +125,7 @@ export default class {
         var char = undefined;
 
         //check index.
-        if (this._inRagneOf(index)) {
+        if (this._inRangeOf(index)) {
             //get char
             char = this.#sequence.charAt(index);
         }
@@ -307,7 +300,7 @@ export default class {
             let nextChar = '';
 
             //check index
-            if (this._inRagneOf(++nextIdx)) {
+            if (this._inRangeOf(++nextIdx)) {
                 //next sentence
                 sentence = this._getSentence(nextIdx);
 
@@ -349,7 +342,7 @@ export default class {
             let prevChar = '';
 
             //check index.
-            if (this._inRagneOf(--prevIdx)) {
+            if (this._inRangeOf(--prevIdx)) {
                 //get prev char
                 prevChar = this._getCharAt(prevIdx);
 
@@ -359,7 +352,7 @@ export default class {
                     prevChar = '';
 
                     //check index.
-                    if (this._inRagneOf(--prevIdx)) {
+                    if (this._inRangeOf(--prevIdx)) {
                         //get prev char
                         prevChar = this._getCharAt(prevIdx);
                     }

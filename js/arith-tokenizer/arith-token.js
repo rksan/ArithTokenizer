@@ -94,22 +94,16 @@ var def = class {
         return this.#toString();
         //return this.chars().join('');
     }
-/*
+
+    //private method
+
     //@param separator : String
     //@return String
-    #toString(separator) {
+    #toString = function _toString(separator){
         return this.chars().join(separator || '');
     }
-*/
 };
 
-//private method.
-
-//@param separator : String
-    //@return String
-def.prototype.#toString = function(){
-    return this.chars().join(separator || '');
-}
 
 //@export
 export default def;

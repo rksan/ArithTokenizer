@@ -1,6 +1,6 @@
 import TokenType from './arith-token-type.js';
 
-export default class {
+var def = class {
     //_ArithToken
 
     //members
@@ -91,8 +91,8 @@ export default class {
 
     //@return String
     toString() {
-        //return this.#toString();
-        return this.chars().join('');
+        return this.#toString();
+        //return this.chars().join('');
     }
 /*
     //@param separator : String
@@ -102,3 +102,14 @@ export default class {
     }
 */
 };
+
+//private method.
+
+//@param separator : String
+    //@return String
+def.prototype.#toString = function(){
+    return this.chars().join(separator || '');
+}
+
+//@export
+export default def;

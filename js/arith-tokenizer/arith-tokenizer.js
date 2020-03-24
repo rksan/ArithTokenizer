@@ -53,13 +53,13 @@ export default class {
     //@return boolean
     hasNext() {
         var nextIndex = this.#currentIndex + 1;
-        return this.#inRagneOf(nextIndex);
+        return this._inRagneOf(nextIndex);
     }
 
     //get next token.
     //@return token or undefined: next token.
     next() {
-        var token = this.#nextToken();
+        var token = this._nextToken();
         return token;
     }
 
@@ -85,7 +85,7 @@ export default class {
         var idx = this.#currentIndex;
 
         //next sentence
-        var nextSentence = this.#getSentence(++idx);
+        var nextSentence = this._getSentence(++idx);
 
         //return value.
         var type = nextSentence.type;
@@ -93,7 +93,7 @@ export default class {
         var index = nextSentence.currentIndex;
 
         //create new token
-        var token = this.#createToken(type, chars);
+        var token = this._createToken(type, chars);
 
         if (token.isNone()) {
             //is end
@@ -132,7 +132,7 @@ export default class {
         var char = undefined;
 
         //check index.
-        if (this.#inRagneOf(index)) {
+        if (this._inRagneOf(index)) {
             //get char
             char = this.#sequence.charAt(index);
         }
@@ -208,11 +208,11 @@ export default class {
     _asOperator(char) {
         var type = undefined;
 
-        if (type = this.#asPlus(char)) {
+        if (type = this._asPlus(char)) {
             return type;
-        } else if (type = this.#asStar(char)) {
+        } else if (type = this._asStar(char)) {
             return type;
-        } else if (type = this.#asSlash(char)) {
+        } else if (type = this._asSlash(char)) {
             return type;
         }
 
@@ -238,9 +238,9 @@ export default class {
     _asSelector(char) {
         var type = undefined;
 
-        if (type = this.#asLeftSelector(char)) {
+        if (type = this._asLeftSelector(char)) {
             return type;
-        } else if (type = this.#asRightSelector(char)) {
+        } else if (type = this._asRightSelector(char)) {
             return type;
         }
 
@@ -284,18 +284,18 @@ export default class {
         var type = '';
         var chars = [];
         var index = startIndex;
-        var sentence = this.#sentence(type, index, chars);
-        var char = this.#getCharAt(index);
+        var sentence = this._sentence(type, index, chars);
+        var char = this._getCharAt(index);
 
         //(Summary) Fixed an issue where calling 'Tokenizer.next ()' after reaching the end of the sequence would result in a runtime error.
         //(Details) In the state of "Tokenizer.hasNext () === false", the return value of "Tokenizer.next ()" must return "undefined". However, the argument of "Tokenizer._asNumber (char)" in the first "if" of the internal process "Tokenizer._getSentence ()" cannot be "undefined". Before that, it was changed to determine "char === undefined".
-        if (type = this.#asNone(char)) { //need first.
+        if (type = this._asNone(char)) { //need first.
             //as end
 
             //create sentence.
-            sentence = this.#sentence(type, index, chars);
+            sentence = this._sentence(type, index, chars);
 
-        } else if (type = this.#asNumber(char)) {
+        } else if (type = this._asNumber(char)) {
             //as number
 
             //---
@@ -307,15 +307,15 @@ export default class {
             let nextChar = '';
 
             //check index
-            if (this.#inRagneOf(++nextIdx)) {
+            if (this._inRagneOf(++nextIdx)) {
                 //next sentence
-                sentence = this.#getSentence(nextIdx);
+                sentence = this._getSentence(nextIdx);
 
                 nextChar = sentence.chars[0];
             }
 
             //The next character is a number
-            if (this.#asNumber(nextChar)) {
+            if (this._asNumber(nextChar)) {
                 //two or more digits.
 
                 //format is 'NUMBER'+'NUMBER'+...
@@ -329,15 +329,15 @@ export default class {
             }
 
             //create sentence.
-            sentence = this.#sentence(type, index, chars);
+            sentence = this._sentence(type, index, chars);
 
-        } else if (type = this.#asSpace(char)) {
+        } else if (type = this._asSpace(char)) {
             //skip space.
 
             //next sentence.
-            sentence = this.#getSentence(++index);
+            sentence = this._getSentence(++index);
 
-        } else if (type = this.#asMinus(char)) {
+        } else if (type = this._asMinus(char)) {
             //as operator or number
 
             //---
@@ -349,73 +349,73 @@ export default class {
             let prevChar = '';
 
             //check index.
-            if (this.#inRagneOf(--prevIdx)) {
+            if (this._inRagneOf(--prevIdx)) {
                 //get prev char
-                prevChar = this.#getCharAt(prevIdx);
+                prevChar = this._getCharAt(prevIdx);
 
                 //skip space.
-                while (this.#asSpace(prevChar)) {
+                while (this._asSpace(prevChar)) {
                     //init
                     prevChar = '';
 
                     //check index.
-                    if (this.#inRagneOf(--prevIdx)) {
+                    if (this._inRagneOf(--prevIdx)) {
                         //get prev char
-                        prevChar = this.#getCharAt(prevIdx);
+                        prevChar = this._getCharAt(prevIdx);
                     }
                 }
             }
 
             //The previous character is not a number
-            if (!this.#asNumber(prevChar)) {
+            if (!this._asNumber(prevChar)) {
                 //as number.
 
                 //next sentence
-                sentence = this.#getSentence(++index);
+                sentence = this._getSentence(++index);
 
                 //format is '-'+'NUMBER'+'NUMBER'+...
                 chars = [char].concat(sentence.chars);
 
-                type = this.#asNumber();
+                type = this._asNumber();
 
                 index = sentence.currentIndex;
 
                 //create sentence.
-                sentence = this.#sentence(type, index, chars);
+                sentence = this._sentence(type, index, chars);
 
             } else {
                 //as operator.
                 chars.push(char);
 
                 //create sentence.
-                sentence = this.#sentence(type, index, chars);
+                sentence = this._sentence(type, index, chars);
             }
 
-        } else if (type = this.#asOperator(char)) {
+        } else if (type = this._asOperator(char)) {
             //as operator.
 
             chars.push(char);
 
             //create sentence.
-            sentence = this.#sentence(type, index, chars);
+            sentence = this._sentence(type, index, chars);
 
-        } else if (type = this.#asSelector(char)) {
+        } else if (type = this._asSelector(char)) {
             //as selector.
 
             chars.push(char);
 
             //create sentence.
-            sentence = this.#sentence(type, index, chars);
+            sentence = this._sentence(type, index, chars);
 
         } else {
             //as error
 
             chars.push(char);
 
-            type = this.#asError();
+            type = this._asError();
 
             //create sentence.
-            sentence = this.#sentence(type, index, chars);
+            sentence = this._sentence(type, index, chars);
         }
 
         return sentence;

@@ -23,8 +23,8 @@
 //*/
 //</script>
 
-import TokenType from './arith-token-type';
-import Factory from './arith-tokenizer-factory'
+import TokenType from './arith-token-type.js';
+import Factory from './arith-tokenizer-factory.js';
 
 export default class {
     //class _ArithTokenizer

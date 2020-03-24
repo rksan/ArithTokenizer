@@ -1,6 +1,6 @@
 //import TokenType from './arith-token-type'
-import Token from './arith-token'
-import Tokenizer from './arith-tokenizer';
+import Token from './arith-token.js'
+import Tokenizer from './arith-tokenizer.js';
 
 export default class {
     //class _ArithTokenizerFactory

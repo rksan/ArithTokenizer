@@ -1,23 +1,27 @@
-import TokenType from './arith-token-type.js'
+import TokenType from './arith-token-type'
 
 export default class {
     //_ArithToken
 
+    //members
+    #type;
+    #chars;
+
     //@param type : String [property of _ArithTokenType.XXX]
     //@param chars : [char array]
     constructor(type, chars) {
-        this._type = type || ''; //string of token type
-        this._chars = chars || []; //[array of string]
+        this.#type = type || ''; //string of token type
+        this.#chars = chars || []; //[array of string]
     }
 
     //@return string
     type() {
-        return this._type;
+        return this.#type;
     }
 
     //@return [char array]
     chars() {
-        return this._chars;
+        return this.#chars;
     }
 
     //@return boolean
@@ -87,12 +91,12 @@ export default class {
 
     //@return String
     toString() {
-        return this._toString();
+        return this.#toString();
     }
 
     //@param separator : String
     //@return String
-    _toString(separator) {
+    #toString(separator) {
         return this.chars().join(separator || '');
     }
 };

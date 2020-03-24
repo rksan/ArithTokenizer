@@ -1,4 +1,4 @@
-import Tokenizer from './arith-tokenizer/arith-tokenizer.js';
+import Factory from './arith-tokenizer/arith-tokenizer-factory';
 
 (function ($) {
     $(function _ready() {
@@ -11,7 +11,7 @@ import Tokenizer from './arith-tokenizer/arith-tokenizer.js';
             var $console = $body.find('#arith_console');
 
             //var tokenizer = new _ArithTokenizer(sequence);
-            var tokenizer = new Tokenizer(sequence);
+            var tokenizer = Factory.createTokenizer(sequence);
 
             $console.append($('<div />').append($('<span />').text('sequence:'), $('<span />').text(sequence)));
 
